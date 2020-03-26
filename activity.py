@@ -51,9 +51,10 @@ def get_activity(home, hotspot_map):
     witness_id = a['poc_witness_challenge_id']
     challenge_req_hash = a['poc_req_txn_hash']
     challenge_hash = a['poc_rx_txn_hash']
+    in_consensus = a['in_consensus']
     id_spacing = ''
   
-    if reward_type is not None and reward_type.startswith('poc'):
+    if reward_type is not None:
       block_id = a['reward_block_height']
       reward_amount = a['reward_amount']/100000000
       reward_time = datetime.datetime.fromtimestamp(a['reward_block_time']).isoformat(timespec='seconds')
@@ -64,6 +65,11 @@ def get_activity(home, hotspot_map):
         print(f"{reward_time}: Block {block_id} - {id_spacing:9} Mined {reward_amount} - Challengee")
       elif reward_type == 'poc_witnesses':
         print(f"{reward_time}: Block {block_id} - {id_spacing:9} Mined {reward_amount} - Witness")
+      elif reward_type == 'consensus':
+        print(f"{reward_time}: Block {block_id} - {id_spacing:9} Mined {reward_amount} - Consensus Group")
+    elif in_consensus:
+      block_time = datetime.datetime.fromtimestamp(a['election_txn_block_time']).isoformat(timespec='seconds')
+      print(f"{block_time}: Block {block_id} - {id_spacing:9} Joined consensus group")
     elif witness_id is not None:
       witness_time = datetime.datetime.fromtimestamp(a['poc_rx_txn_block_time']).isoformat(timespec='seconds')
       block_id = a['poc_rx_txn_block_height']
@@ -80,6 +86,7 @@ def get_activity(home, hotspot_map):
       get_challenge(home, challenge_id, hotspot_map)
     else:
       print("Unknown")
+      print(a)
 
 def loc(d, prefix=''):
   return (d[f'{prefix}lat'], d[f'{prefix}lng'])
